@@ -3,19 +3,26 @@ begin;
 create extension if not exists pgtap with schema extensions;
 select plan(40);
 
+-- Isolate from any seed/E2E data (rolled back with the transaction).
+truncate table public.task_updates, public.tasks, public.audit_logs, public.profiles restart identity cascade;
+delete from public.departments
+ where name not in ('Production','Quality Control','Dispatch','Sales','Purchase','Accounts','Administration');
+update public.departments set is_active = true;
+
+
 -- Fixtures: admin; manager1 -> emp1, emp2; manager2 -> emp3. Fictional only.
 insert into public.profiles (id, employee_code, full_name, work_email, role) values
-  ('b0000000-0000-4000-8000-000000000001', 'T-ADM', 'Test Admin',    'admin@example.com',    'admin'),
-  ('b0000000-0000-4000-8000-000000000002', 'T-M1',  'Test Manager1', 'manager1@example.com', 'manager'),
-  ('b0000000-0000-4000-8000-000000000003', 'T-M2',  'Test Manager2', 'manager2@example.com', 'manager');
+  ('b0000000-0000-4000-8000-000000000001', 'T-ADM', 'Test Admin',    'admin@test.local',    'admin'),
+  ('b0000000-0000-4000-8000-000000000002', 'T-M1',  'Test Manager1', 'manager1@test.local', 'manager'),
+  ('b0000000-0000-4000-8000-000000000003', 'T-M2',  'Test Manager2', 'manager2@test.local', 'manager');
 insert into public.profiles (id, employee_code, full_name, work_email, role, reporting_manager_id, department_id) values
-  ('b0000000-0000-4000-8000-000000000004', 'T-E1', 'Test Emp1', 'emp1@example.com', 'employee', 'b0000000-0000-4000-8000-000000000002', (select id from public.departments where name = 'Production')),
-  ('b0000000-0000-4000-8000-000000000005', 'T-E2', 'Test Emp2', 'emp2@example.com', 'employee', 'b0000000-0000-4000-8000-000000000002', (select id from public.departments where name = 'Production')),
-  ('b0000000-0000-4000-8000-000000000006', 'T-E3', 'Test Emp3', 'emp3@example.com', 'employee', 'b0000000-0000-4000-8000-000000000003', (select id from public.departments where name = 'Sales'));
+  ('b0000000-0000-4000-8000-000000000004', 'T-E1', 'Test Emp1', 'emp1@test.local', 'employee', 'b0000000-0000-4000-8000-000000000002', (select id from public.departments where name = 'Production')),
+  ('b0000000-0000-4000-8000-000000000005', 'T-E2', 'Test Emp2', 'emp2@test.local', 'employee', 'b0000000-0000-4000-8000-000000000002', (select id from public.departments where name = 'Production')),
+  ('b0000000-0000-4000-8000-000000000006', 'T-E3', 'Test Emp3', 'emp3@test.local', 'employee', 'b0000000-0000-4000-8000-000000000003', (select id from public.departments where name = 'Sales'));
 insert into auth.users (id, email, aud, role, instance_id)
 select ('a0000000-0000-4000-8000-00000000000' || n)::uuid, e, 'authenticated', 'authenticated', '00000000-0000-0000-0000-000000000000'
-from (values (1,'admin@example.com'),(2,'manager1@example.com'),(3,'manager2@example.com'),
-             (4,'emp1@example.com'),(5,'emp2@example.com'),(6,'emp3@example.com')) v(n, e);
+from (values (1,'admin@test.local'),(2,'manager1@test.local'),(3,'manager2@test.local'),
+             (4,'emp1@test.local'),(5,'emp2@test.local'),(6,'emp3@test.local')) v(n, e);
 
 -- helper table to pass ids between role switches
 create temp table ids (k text primary key, v uuid);
