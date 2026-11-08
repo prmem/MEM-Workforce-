@@ -1,4 +1,4 @@
-// Fictional demo data for LOCAL development and tests only.
+// Fictional demo data for LOCAL development and tests (and an explicitly named preview project).
 // Usage: npm run seed   (reads .env.local; run after `supabase db reset`)
 // Refuses to run against any non-local Supabase URL. Never put real employee data here.
 import { createClient } from "@supabase/supabase-js";
@@ -14,7 +14,16 @@ function fail(msg) {
 
 if (!url || !serviceKey || !password) fail("NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and SEED_USER_PASSWORD must be set in .env.local.");
 const host = new URL(url).hostname;
-if (!["127.0.0.1", "localhost"].includes(host)) fail(`refusing to seed non-local Supabase (${host}).`);
+// A remote project may be seeded ONLY when it is explicitly named as a preview project:
+//   SEED_PREVIEW_PROJECT_REF=<ref> where the URL is https://<ref>.supabase.co
+// Never use this for a production project.
+const previewRef = process.env.SEED_PREVIEW_PROJECT_REF;
+const isLocal = ["127.0.0.1", "localhost"].includes(host);
+const isNamedPreview = !!previewRef && /^[a-z0-9]{20}$/.test(previewRef) && host === `${previewRef}.supabase.co`;
+if (!isLocal && !isNamedPreview) {
+  fail(`refusing to seed non-local Supabase (${host}). For a preview project only, set SEED_PREVIEW_PROJECT_REF to its project ref.`);
+}
+if (isNamedPreview) console.log(`Seeding PREVIEW project ${previewRef} with fictional data.`);
 if (password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) fail("SEED_USER_PASSWORD must be 8+ characters with letters and numbers.");
 
 const db = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
