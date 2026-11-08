@@ -403,6 +403,14 @@ revoke execute on function
   public.colleague_names()
 from public, anon;
 
+-- Internal / trigger functions: not callable by any client role.
+revoke execute on function
+  public.set_updated_at(),
+  public.profiles_enforce_rules(),
+  public.link_auth_user_to_profile(),
+  public.write_audit_log()
+from authenticated;
+
 grant execute on function
   public.current_profile_id(),
   public.current_app_role(),
