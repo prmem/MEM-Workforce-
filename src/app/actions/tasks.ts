@@ -144,7 +144,9 @@ export async function updateTaskProgress(_prev: FormState, formData: FormData): 
 
   revalidatePath(`/tasks/${p.task_id}`);
   revalidatePath("/tasks");
-  return { message: p.new_status === "submitted_for_review" ? "Submitted for review." : "Update saved." };
+  // Submitting replaces the progress panel, so confirm on the page itself.
+  if (p.new_status === "submitted_for_review") redirect(`/tasks/${p.task_id}?done=submitted`);
+  return { message: "Update saved." };
 }
 
 const reviewSchema = z.object({
@@ -174,7 +176,7 @@ export async function reviewTask(_prev: FormState, formData: FormData): Promise<
 
   revalidatePath(`/tasks/${r.task_id}`);
   revalidatePath("/tasks");
-  return { message: r.decision === "approve" ? "Task approved and marked Completed." : "Task reopened." };
+  redirect(`/tasks/${r.task_id}?done=${r.decision === "approve" ? "approved" : "reopened"}`);
 }
 
 export async function cancelTask(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -190,7 +192,7 @@ export async function cancelTask(_prev: FormState, formData: FormData): Promise<
 
   revalidatePath(`/tasks/${id.data}`);
   revalidatePath("/tasks");
-  return { message: "Task cancelled." };
+  redirect(`/tasks/${id.data}?done=cancelled`);
 }
 
 export async function reassignTask(_prev: FormState, formData: FormData): Promise<FormState> {

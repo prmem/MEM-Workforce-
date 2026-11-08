@@ -11,6 +11,13 @@ import { ProgressPanel, ReviewPanel, ManagePanel } from "./panels";
 
 export const metadata: Metadata = { title: "Task details" };
 
+const DONE_MESSAGES: Record<string, string> = {
+  submitted: "Submitted for review. Your manager will approve it or send it back.",
+  approved: "Task approved and marked Completed.",
+  reopened: "Task reopened. The employee can continue working on it.",
+  cancelled: "Task cancelled.",
+};
+
 const KIND_LABEL: Record<string, string> = {
   created: "Created the task",
   status: "Changed status",
@@ -77,6 +84,7 @@ export default async function TaskDetailsPage({ params, searchParams }: PageProp
       <div className="space-y-3">
         {sp.created ? <Alert tone="success">Task created and assigned.</Alert> : null}
         {sp.saved ? <Alert tone="success">Task updated.</Alert> : null}
+        {typeof sp.done === "string" && DONE_MESSAGES[sp.done] ? <Alert tone="success">{DONE_MESSAGES[sp.done]}</Alert> : null}
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
