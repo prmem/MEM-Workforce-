@@ -1,5 +1,7 @@
 # Deployment (for when the owner approves)
 
+> **Preview without sharing any keys:** see [PREVIEW_SETUP.md](PREVIEW_SETUP.md) for a click-through setup using the Supabase and Vercel websites only.
+
 > **Nothing has been deployed.** These steps are for a future preview or production setup and require the owner's approval.
 
 ## Accounts and services needed

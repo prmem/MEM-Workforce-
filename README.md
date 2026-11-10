@@ -19,6 +19,7 @@ Documentation:
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how the app is built
 - [docs/DATABASE.md](docs/DATABASE.md): tables, security rules, sources of truth
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): Supabase cloud and Vercel setup (for when approved)
+- [docs/PREVIEW_SETUP.md](docs/PREVIEW_SETUP.md): click-through online preview with fictional data
 - [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) and [docs/EMPLOYEE_GUIDE.md](docs/EMPLOYEE_GUIDE.md): user guides
 - [docs/PRIVACY_NOTES.md](docs/PRIVACY_NOTES.md): privacy and compliance items needing review
 - [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)
@@ -76,6 +77,7 @@ Emails sent by the local stack (invites, password resets) are caught by Mailpit 
 | `npm run db:reset` | Recreate the local database from migrations, then seed fictional data |
 | `npm run db:types` | Regenerate `src/lib/database.types.ts` from the local schema |
 | `npm run seed` | Seed fictional data (local only; refuses non-local URLs) |
+| `npm run db:bundle` | Print all migrations as one SQL file, for the Supabase SQL Editor (see PREVIEW_SETUP.md) |
 
 Recommended full check, run from a clean state:
 
